@@ -2,21 +2,17 @@ import { Box } from "@mui/system";
 import { Container } from "./Container";
 import { Button, Stack, Typography } from "@mui/material";
 import { TodoItem } from "./TodoItem";
-import { useTodoContext } from "../provider/provider";
 import { SelectInput } from "./SelectInput";
-import { useEffect } from "react";
-
+import {  useDispatch, useSelector } from "react-redux";
+import { clearTodoList } from "../provider/todoSlice";
 export const TodoList = () => {
-  const { todoList,setTodoList,filter} = useTodoContext();
-
-
-
+  const dispatch = useDispatch()
+  const todoList = useSelector((state) => state.todos.todoList)
+  const filter = useSelector((state) => state.todos.filter)
   const completedTodos = todoList.filter(todo => todo.completed === true);
   const unCompletedTodos = todoList.filter(todo => todo.completed === false);
   const activeTodos = todoList.filter(todo => !todo.completed);
-  useEffect(()=>{
-    
-  },)
+  console.log(todoList.length)
   return (
     <Box sx={{ width: "100%" }}>
       <Container>
@@ -27,8 +23,12 @@ export const TodoList = () => {
           <Box sx={{}}>
             <SelectInput/>
           </Box>
-          <Box className="todos" sx={{ height: "50%", maxHeight: "400px", width:'100%' }}>
+          <Box className="todos" sx={{width:'100%', display:'flex',flexDirection:'column',alignItems:'center' }}>
           {(() => {
+            if (todoList.length === 0){
+              
+              return <Typography variant="h3" sx={{ marginTop: "30px", marginBottom: "30px",}}>Have no one Todo</Typography>
+            }
             switch (filter) {
               case 'all':
                 return todoList.map((todo) => (
@@ -49,8 +49,8 @@ export const TodoList = () => {
           })()}
           </Box>
           <Stack sx={{margin:'0 auto',paddingTop:'30px'}} direction="row" spacing={2}>
-            <Button onClick={() => setTodoList([])}>Delete all</Button>
-            <Button onClick={() => setTodoList(activeTodos)}>Delete add done</Button>
+            <Button onClick={() => dispatch(clearTodoList([]))}>Delete all</Button>
+            <Button onClick={() => dispatch(clearTodoList(activeTodos))}>Delete add done</Button>
           </Stack>
         </Box>
       </Container>

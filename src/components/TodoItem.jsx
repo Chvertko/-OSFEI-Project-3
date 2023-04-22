@@ -2,18 +2,17 @@ import { Button, Checkbox, IconButton, TextField, Typography } from "@mui/materi
 import { Box, Stack } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useTodoContext } from "../provider/provider";
+import { editTodo, toggleTodo, removeTodo } from '../provider/todoSlice'
 import "../styles/checked.css";
 import { useState } from "react";
+import { useDispatch } from 'react-redux'
 
 export const TodoItem = (props) => {
   const  { id,text,completed } = props
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
-  const {toggleTodo,removeTodo,editTodo} = useTodoContext()
   const [editingText, setEditingText] = useState(text);
   const [isEditing, setIsEditing] = useState(false);
-
-
+  const dispatch = useDispatch()
   const handleEditButtonClick = () => {
     setIsEditing(true)
   };
@@ -23,7 +22,7 @@ export const TodoItem = (props) => {
   };
 
   const handleSaveButtonClick = () => {
-    editTodo({ ...props, text: editingText });
+    dispatch(editTodo({ ...props, text: editingText }))
     setIsEditing(false);
   };
 
@@ -36,8 +35,8 @@ export const TodoItem = (props) => {
         padding: "20px",
         display: "flex",
         justifyContent: "space-between",
+        width:"100%",
         alignItems: "center",
-        boxShadow: "0px 0px 10px 5px rgba(54, 54, 54, 0.2)"
       }}
     >
         {isEditing ? 
@@ -51,23 +50,38 @@ export const TodoItem = (props) => {
         : 
         (
             
-        <Box sx={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Typography className={completed ? "completed" : ''} >{text}</Typography>
+          <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width:'100%',
+            padding: "1rem",
+            borderRadius: "8px",
+            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <Typography
+            sx={{ flex: 1, marginRight: "1rem" }}
+            className={completed ? "completed" : ""}
+          >
+            {text}
+          </Typography>
           <Stack direction="row" spacing={3}>
-            <Checkbox {...label}  onChange={() => toggleTodo(id)}  checked={completed} />
+            <Checkbox
+              {...label}
+              onChange={() => dispatch(toggleTodo(id))}
+              checked={completed}
+            />
             <Button onClick={handleEditButtonClick}>
-              <IconButton>
-                <EditIcon />
-              </IconButton>
+              <EditIcon />
             </Button>
-            <Button onClick={() => removeTodo(id)}>
-              <IconButton>
-                <DeleteIcon />
-              </IconButton>
+            <Button onClick={() => dispatch(removeTodo(id))}>
+              <DeleteIcon />
             </Button>
           </Stack>
-        </Box>
+        </Box>        
         )}
-        </Box>
+    </Box>
   );
 };
